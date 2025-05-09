@@ -37,27 +37,37 @@ export default function LoginScreen({ navigation }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        // If there is an error in the response, handle it here
         if (data.error) {
           if (data.code === "001") {
-            setEmailError(data.error); // Invalid email or account does not exist
+            setEmailError(data.error);
           } else if (data.code === "003") {
-            setPasswordError(data.error); // Incorrect password
+            setPasswordError(data.error);
           } else {
             Alert.alert("Error", "Login failed");
           }
         } else {
-          // Successfully logged in
-          console.log("✅ User logged in:", data);
-          
           if (data.access && data.refresh) {
-            // Store tokens in AsyncStorage
             AsyncStorage.setItem("accessToken", data.access)
               .then(() => {
                 AsyncStorage.setItem("refreshToken", data.refresh)
-                  .then(() => {
-                    Alert.alert("Success", "Login successful");
-                    navigation.navigate("HomeScreen");
+                  .then(async () => {
+                    try {
+                      const profileResponse = await fetch("http://172.20.10.10:8000/api/v1/auth/users/", {
+                        method: "GET",
+                        headers: {
+                          "Authorization": `Bearer ${data.access}`,
+                          "Content-Type": "application/json",
+                        },
+                      });
+
+                      const profileData = await profileResponse.json();
+                      console.log("👤 Profile:", profileData);
+                      Alert.alert("Success", "Login successful");
+                      navigation.navigate("HomeScreen");
+                    } catch (err) {
+                      console.error("❌ Error loading profile:", err);
+                      Alert.alert("Error", "Failed to load profile.");
+                    }
                   })
                   .catch((error) => {
                     console.error("Error storing refreshToken:", error);
@@ -81,7 +91,6 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Logo Section */}
       <View style={styles.logoContainer}>
         <Image
           source={require("../assets/logo.png")}
@@ -89,13 +98,11 @@ export default function LoginScreen({ navigation }) {
         />
       </View>
 
-      {/* Title and Subtitle */}
       <Text style={styles.title}>Get Started now</Text>
       <Text style={styles.subtitle}>
         Welcome! Sign in using your social account or email to continue us
       </Text>
 
-      {/* Email Input */}
       <View style={styles.inputContainer}>
         <TextInput
           style={[styles.input, emailError ? styles.errorInput : null]}
@@ -104,13 +111,12 @@ export default function LoginScreen({ navigation }) {
           value={email}
           onChangeText={(text) => {
             setEmail(text);
-            setEmailError(""); // Reset email error when user starts typing
+            setEmailError("");
           }}
           keyboardType="email-address"
         />
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-        {/* Password Input with Toggle Visibility */}
         <View style={styles.passwordContainer}>
           <TextInput
             style={[styles.passwordInput, passwordError ? styles.errorInput : null]}
@@ -119,7 +125,7 @@ export default function LoginScreen({ navigation }) {
             value={password}
             onChangeText={(text) => {
               setPassword(text);
-              setPasswordError(""); // Reset password error when user starts typing
+              setPasswordError("");
             }}
             secureTextEntry={!passwordVisible}
           />
@@ -129,7 +135,6 @@ export default function LoginScreen({ navigation }) {
         </View>
         {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
-        {/* Remember Me Checkbox */}
         <View style={styles.rememberMeContainer}>
           <CheckBox value={rememberMe} onValueChange={setRememberMe} style={styles.checkbox} />
           <Text style={styles.rememberMeText}>Remember me</Text>
@@ -138,13 +143,11 @@ export default function LoginScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate("HomeScreen")}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
           <Text style={styles.loginButtonText}>Log In</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Footer with Sign Up Link */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
@@ -266,4 +269,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
