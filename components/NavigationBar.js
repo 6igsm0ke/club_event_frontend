@@ -15,10 +15,10 @@ export default function NavigationBar({ navigation }) {
       </TouchableOpacity>
 
       {/* Search Button (Uncomment if needed) */}
-      {/* <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Search')}>
+      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('EventList')}>
         <MaterialCommunityIcons name="magnify" size={30} color="white" />
-        <Text style={styles.navText}>Search</Text>
-      </TouchableOpacity> */}
+        <Text style={styles.navText}>Events</Text>
+      </TouchableOpacity>
 
       {/* Chat Button (Uncomment if needed) */}
       <TouchableOpacity

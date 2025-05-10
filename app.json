@@ -2,6 +2,8 @@
   "expo": {
     "name": "club_event_frontend",
     "slug": "club_event_frontend",
+    "scheme": "clubevent",
+    "deeplinking": true,  
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,7 +27,7 @@
       "favicon": "./assets/favicon.png"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0  
+      "fallbackToCacheTimeout": 0
     }
   }
 }

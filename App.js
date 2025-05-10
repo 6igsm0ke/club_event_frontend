@@ -1,6 +1,7 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import ChatScreen from "./screens/ChatScreen";
 import CreateEventScreen from "./screens/CreateEventScreen";
 import EventListScreen from "./screens/EventListScreen";
@@ -10,6 +11,12 @@ import HomeScreen from "./screens/HomeScreen";
 import QosylAppAnimation from "./screens/SplashScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import EventDetailScreen from "./screens/EventDetailScreen";
+import VerifyAccountScreen from "./screens/VerifyYourScreen";
+import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+import CategoryEventsScreen from "./screens/CategoryEventScreen";
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -39,6 +46,11 @@ export default function App() {
           component={SignUpScreen}
           options={{ title: "Sign Up" }}
         />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+          options={{ title: "Forgot Password" }}
+        />
 
         {/* Main Screens */}
         <Stack.Screen
@@ -65,6 +77,26 @@ export default function App() {
           name="Chat"
           component={ChatScreen}
           options={{ title: "Chat Room" }}
+        />
+        <Stack.Screen
+          name="EventDetail"
+          component={EventDetailScreen}
+          options={{ title: "Event Details" }}
+        />
+        <Stack.Screen
+          name="VerifyAccount"
+          component={VerifyAccountScreen}
+          options={{ title: "Verify Account" }}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfileScreen}
+          options={{ title: "Edit Profile" }}
+        />
+        <Stack.Screen
+          name="CategoryEvents"
+          component={CategoryEventsScreen}
+          options={{ title: "Category Events" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

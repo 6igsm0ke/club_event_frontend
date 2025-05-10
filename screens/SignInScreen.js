@@ -6,10 +6,11 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
   Alert,
   Image,
 } from "react-native";
-import CheckBox from 'react-native-checkbox';
+import CheckBox from "react-native-checkbox";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -52,16 +53,18 @@ export default function LoginScreen({ navigation }) {
                 AsyncStorage.setItem("refreshToken", data.refresh)
                   .then(async () => {
                     try {
-                      const profileResponse = await fetch("http://172.20.10.10:8000/api/v1/auth/users/", {
-                        method: "GET",
-                        headers: {
-                          "Authorization": `Bearer ${data.access}`,
-                          "Content-Type": "application/json",
-                        },
-                      });
-
+                      const profileResponse = await fetch(
+                        "http://172.20.10.10:8000/api/v1/auth/users/me/",
+                        {
+                          method: "GET",
+                          headers: {
+                            Authorization: `Bearer ${data.access}`,
+                            "Content-Type": "application/json",
+                          },
+                        }
+                      );
                       const profileData = await profileResponse.json();
-                      console.log("👤 Profile:", profileData);
+                      // console.log("👤 Profile:", profileData);
                       Alert.alert("Success", "Login successful");
                       navigation.navigate("HomeScreen");
                     } catch (err) {
@@ -71,12 +74,18 @@ export default function LoginScreen({ navigation }) {
                   })
                   .catch((error) => {
                     console.error("Error storing refreshToken:", error);
-                    Alert.alert("Error", "An error occurred while storing refresh token.");
+                    Alert.alert(
+                      "Error",
+                      "An error occurred while storing refresh token."
+                    );
                   });
               })
               .catch((error) => {
                 console.error("Error storing accessToken:", error);
-                Alert.alert("Error", "An error occurred while storing access token.");
+                Alert.alert(
+                  "Error",
+                  "An error occurred while storing access token."
+                );
               });
           } else {
             Alert.alert("Error", "Login failed");
@@ -90,7 +99,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.logoContainer}>
         <Image
           source={require("../assets/logo.png")}
@@ -119,7 +128,10 @@ export default function LoginScreen({ navigation }) {
 
         <View style={styles.passwordContainer}>
           <TextInput
-            style={[styles.passwordInput, passwordError ? styles.errorInput : null]}
+            style={[
+              styles.passwordInput,
+              passwordError ? styles.errorInput : null,
+            ]}
             placeholder="Create a password"
             placeholderTextColor="#999"
             value={password}
@@ -129,16 +141,31 @@ export default function LoginScreen({ navigation }) {
             }}
             secureTextEntry={!passwordVisible}
           />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-            <Ionicons name={passwordVisible ? "eye" : "eye-off"} size={24} color="gray" />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
+            <Ionicons
+              name={passwordVisible ? "eye" : "eye-off"}
+              size={24}
+              color="gray"
+            />
           </TouchableOpacity>
         </View>
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {passwordError ? (
+          <Text style={styles.errorText}>{passwordError}</Text>
+        ) : null}
 
         <View style={styles.rememberMeContainer}>
-          <CheckBox value={rememberMe} onValueChange={setRememberMe} style={styles.checkbox} />
+          <CheckBox
+            value={rememberMe}
+            onValueChange={setRememberMe}
+            style={styles.checkbox}
+          />
           <Text style={styles.rememberMeText}>Remember me</Text>
-          <TouchableOpacity style={styles.forgotContainer}>
+          <TouchableOpacity
+            style={styles.forgotContainer}
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
             <Text style={styles.forgotText}>Forget password?</Text>
           </TouchableOpacity>
         </View>
@@ -154,7 +181,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.link}>Sign Up</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 }
 

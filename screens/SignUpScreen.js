@@ -17,12 +17,12 @@ const SignUpScreen = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState(""); // New state for first name
-  const [lastName, setLastName] = useState(""); // New state for last name
+  const [firstName, setFirstName] = useState(""); 
+  const [lastName, setLastName] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [firstNameError, setFirstNameError] = useState(""); // Error handling for first name
-  const [lastNameError, setLastNameError] = useState(""); // Error handling for last name
+  const [firstNameError, setFirstNameError] = useState(""); 
+  const [lastNameError, setLastNameError] = useState(""); 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleSubmit = () => {
@@ -74,7 +74,7 @@ const SignUpScreen = ({ navigation }) => {
             }
           } else {
             Alert.alert("Success", "Registration successful");
-            navigation.navigate("SignIn");
+            navigation.navigate("VerifyAccount");
           }
         })
         .catch((error) => {
