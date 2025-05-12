@@ -8,21 +8,23 @@ import {
   ScrollView,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import CheckBox from "react-native-checkbox";
-
 import { Ionicons } from "@expo/vector-icons";
 
 const SignUpScreen = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState(""); 
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [firstNameError, setFirstNameError] = useState(""); 
-  const [lastNameError, setLastNameError] = useState(""); 
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastNameError, setLastNameError] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleSubmit = () => {
@@ -33,60 +35,52 @@ const SignUpScreen = ({ navigation }) => {
       password,
     };
 
-    // Reset errors on each submit attempt
     setEmailError("");
     setPasswordError("");
     setFirstNameError("");
     setLastNameError("");
 
-    // Simple client-side validation for demonstration
-    if (!firstName) {
-      setFirstNameError("First Name is required");
-    }
-    if (!lastName) {
-      setLastNameError("Last Name is required");
-    }
-    if (!email) {
-      setEmailError("Email is required");
-    }
-    if (!password) {
-      setPasswordError("Password is required");
-    }
+    if (!firstName) setFirstNameError("First Name is required");
+    if (!lastName) setLastNameError("Last Name is required");
+    if (!email) setEmailError("Email is required");
+    if (!password) setPasswordError("Password is required");
 
     if (email && password && firstName && lastName) {
-      // Proceed with API request if no validation errors
+      setLoading(true);
       fetch("http://172.20.10.10:8000/api/v1/auth/register/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
         .then((response) => response.json())
         .then((data) => {
+          setLoading(false);
           if (data.error) {
-            if (data.code === "001") {
-              setEmailError(data.error); // Email is already in use
-            } else if (data.code === "003") {
-              setPasswordError(data.error); // Incorrect password
-            } else {
-              Alert.alert("Error", "Registration failed");
-            }
+            if (data.code === "001") setEmailError(data.error);
+            else if (data.code === "003") setPasswordError(data.error);
+            else Alert.alert("Error", "Registration failed");
           } else {
             Alert.alert("Success", "Registration successful");
             navigation.navigate("VerifyAccount");
           }
         })
         .catch((error) => {
+          setLoading(false);
           console.error("❌ Error:", error);
           Alert.alert("Error", "An error occurred while trying to register");
         });
     }
   };
 
+  const renderClearIcon = (setter, value) =>
+    value ? (
+      <TouchableOpacity onPress={() => setter("")}>
+        <Ionicons name="close-circle" size={22} color="#999" />
+      </TouchableOpacity>
+    ) : null;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Logo */}
       <View style={styles.logoContainer}>
         <Image
           source={require("../assets/logo.png")}
@@ -99,82 +93,82 @@ const SignUpScreen = ({ navigation }) => {
         Welcome! Sign in using your social account or email to continue us
       </Text>
 
-      {/* Input Fields */}
       <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, firstNameError ? styles.errorInput : null]}
-          placeholder="Enter your first name"
-          placeholderTextColor="#999"
-          value={firstName}
-          onChangeText={(text) => {
-            setFirstName(text);
-            setFirstNameError(""); // Reset first name error when user starts typing
-          }}
-        />
-        {firstNameError ? (
-          <Text style={styles.errorText}>{firstNameError}</Text>
-        ) : null}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.input, firstNameError && styles.errorInput]}
+            placeholder="Enter your first name"
+            placeholderTextColor="#999"
+            value={firstName}
+            onChangeText={(text) => {
+              setFirstName(text);
+              setFirstNameError("");
+            }}
+          />
+          {renderClearIcon(setFirstName, firstName)}
+        </View>
+        {firstNameError && <Text style={styles.errorText}>{firstNameError}</Text>}
 
-        <TextInput
-          style={[styles.input, lastNameError ? styles.errorInput : null]}
-          placeholder="Enter your last name"
-          placeholderTextColor="#999"
-          value={lastName}
-          onChangeText={(text) => {
-            setLastName(text);
-            setLastNameError(""); // Reset last name error when user starts typing
-          }}
-        />
-        {lastNameError ? (
-          <Text style={styles.errorText}>{lastNameError}</Text>
-        ) : null}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.input, lastNameError && styles.errorInput]}
+            placeholder="Enter your last name"
+            placeholderTextColor="#999"
+            value={lastName}
+            onChangeText={(text) => {
+              setLastName(text);
+              setLastNameError("");
+            }}
+          />
+          {renderClearIcon(setLastName, lastName)}
+        </View>
+        {lastNameError && <Text style={styles.errorText}>{lastNameError}</Text>}
 
-        <TextInput
-          style={[styles.input, emailError ? styles.errorInput : null]}
-          placeholder="Enter your email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            setEmailError(""); // Reset email error when user starts typing
-          }}
-          keyboardType="email-address"
-        />
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.input, emailError && styles.errorInput]}
+            placeholder="Enter your email"
+            placeholderTextColor="#999"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              setEmailError("");
+            }}
+            keyboardType="email-address"
+          />
+          {renderClearIcon(setEmail, email)}
+        </View>
+        {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
-        {/* Password Input with Toggle Visibility */}
         <View style={styles.passwordContainer}>
           <TextInput
-            style={[
-              styles.passwordInput,
-              passwordError ? styles.errorInput : null,
-            ]}
+            style={[styles.passwordInput, passwordError && styles.errorInput]}
             placeholder="Create a password"
             placeholderTextColor="#999"
             value={password}
             onChangeText={(text) => {
               setPassword(text);
-              setPasswordError(""); // Reset password error when user starts typing
+              setPasswordError("");
             }}
             secureTextEntry={!passwordVisible}
           />
           <TouchableOpacity
             onPress={() => setPasswordVisible(!passwordVisible)}
+            style={{ marginHorizontal: 5 }}
           >
             <Ionicons
               name={passwordVisible ? "eye" : "eye-off"}
-              size={24}
+              size={22}
               color="gray"
             />
           </TouchableOpacity>
+          {renderClearIcon(setPassword, password)}
         </View>
-        {passwordError ? (
-          <Text style={styles.errorText}>{passwordError}</Text>
-        ) : null}
+        {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
-        {/* Remember Me Checkbox */}
         <View style={styles.rememberMeContainer}>
           <CheckBox
+            label=""
             value={rememberMe}
             onValueChange={setRememberMe}
             style={styles.checkbox}
@@ -182,13 +176,19 @@ const SignUpScreen = ({ navigation }) => {
           <Text style={styles.rememberMeText}>Remember me</Text>
         </View>
 
-        {/* Register Button */}
-        <TouchableOpacity style={styles.registerButton} onPress={handleSubmit}>
-          <Text style={styles.registerButtonText}>Sign Up</Text>
+        <TouchableOpacity
+          style={[styles.registerButton, loading && { opacity: 0.6 }]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.registerButtonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Footer with Sign Up Link */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account?</Text>
         <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
@@ -228,16 +228,21 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: 20,
   },
-  input: {
+  inputWrapper: {
     backgroundColor: "#fff",
-    borderColor: "#d8c8e3",
-    borderWidth: 1,
     borderRadius: 12,
-    padding: 15,
-    fontSize: 16,
-    marginBottom: 20,
-    width: "100%",
+    borderWidth: 1,
+    borderColor: "#d8c8e3",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginBottom: 16,
     elevation: 2,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: 16,
   },
   passwordContainer: {
     backgroundColor: "#fff",
@@ -246,30 +251,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#d8c8e3",
     borderRadius: 12,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     marginBottom: 20,
     width: "100%",
     elevation: 2,
   },
   passwordInput: {
     flex: 1,
-    padding: 15,
+    paddingVertical: 14,
     fontSize: 16,
   },
   errorInput: {
     borderColor: "#FF4D4D",
-    borderWidth: 2,
   },
   errorText: {
     color: "#FF4D4D",
     fontSize: 14,
+    marginTop: -10,
     marginBottom: 10,
-    textAlign: "left",
+    marginLeft: 10,
   },
   rememberMeContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 30,
+    paddingHorizontal: 8,
+    gap: 10,
   },
   checkbox: {
     marginRight: 12,
@@ -294,6 +301,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "center",
+    marginTop: 10,
   },
   footerText: {
     fontSize: 16,

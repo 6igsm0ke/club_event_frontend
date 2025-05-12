@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CreateEventScreen() {
   const [title, setTitle] = useState("");
@@ -23,7 +24,16 @@ export default function CreateEventScreen() {
   const [eventType, setEventType] = useState("");
   const [types, setTypes] = useState([]);
   const [image, setImage] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState("");
   const navigation = useNavigation();
+
+  const locations = [
+    "Red Hall",
+    "Blue Hall",
+    "Wi-Fi Zone",
+    "Auditorium",
+    "Open Area",
+  ];
 
   useEffect(() => {
     fetch("http://172.20.10.10:8000/api/v1/events/types/")
@@ -106,7 +116,6 @@ export default function CreateEventScreen() {
       let response = await submitEvent(token);
 
       if (response.status === 401) {
-        // Try refresh
         token = await refreshAccessToken();
         response = await submitEvent(token);
       }
@@ -121,20 +130,75 @@ export default function CreateEventScreen() {
     }
   };
 
+  const clearField = (setter) => {
+    setter("");
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Create Event</Text>
 
-      <TextInput placeholder="Event Title" style={styles.input} value={title} onChangeText={setTitle} />
-      <TextInput
-        placeholder="Description"
-        style={[styles.input, { height: 100 }]}
-        multiline
-        value={description}
-        onChangeText={setDescription}
-      />
-      <TextInput placeholder="Date (YYYY-MM-DD)" style={styles.input} value={date} onChangeText={setDate} />
-      <TextInput placeholder="Location" style={styles.input} value={location} onChangeText={setLocation} />
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Event Title"
+          style={styles.input}
+          value={title}
+          onChangeText={setTitle}
+        />
+        <TouchableOpacity
+          style={styles.clearButton}
+          onPress={() => clearField(setTitle)}
+        >
+          <Ionicons name="close-circle" size={24} color="#999" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Description"
+          style={[styles.input, { height: 100 }]}
+          multiline
+          value={description}
+          onChangeText={setDescription}
+        />
+        <TouchableOpacity
+          style={styles.clearButton}
+          onPress={() => clearField(setDescription)}
+        >
+          <Ionicons name="close-circle" size={24} color="#999" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Date (YYYY-MM-DD)"
+          style={styles.input}
+          value={date}
+          onChangeText={setDate}
+        />
+        <TouchableOpacity
+          style={styles.clearButton}
+          onPress={() => clearField(setDate)}
+        >
+          <Ionicons name="close-circle" size={24} color="#999" />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.label}>Reserve a Place</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedPlace}
+          onValueChange={(value) => {
+            setSelectedPlace(value);
+            setLocation(value); // отправляется в бэкенд
+          }}
+        >
+          <Picker.Item label="Select a place..." value="" />
+          {locations.map((loc, idx) => (
+            <Picker.Item key={idx} label={loc} value={loc} />
+          ))}
+        </Picker>
+      </View>
 
       <Text style={styles.label}>Event Type</Text>
       <View style={styles.pickerContainer}>
@@ -166,6 +230,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+  },
+  inputContainer: {
+    position: "relative",
   },
   input: {
     borderWidth: 1,
@@ -204,5 +271,11 @@ const styles = StyleSheet.create({
     height: 200,
     marginVertical: 10,
     borderRadius: 8,
+  },
+  clearButton: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+    
   },
 });

@@ -1,30 +1,48 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ChatScreen() {
   const ws = useRef(null);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [chatLog, setChatLog] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://172.20.10.10:8000/ws/chat/lobby/")
+    ws.current = new WebSocket("ws://172.20.10.10:8000/ws/chat/lobby/");
 
     ws.current.onopen = () => {
-      console.log('✅ WebSocket connected');
+      console.log("✅ WebSocket connected");
     };
 
     ws.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      console.log('📩 Received:', data.message);
-      setChatLog((prev) => [...prev, { id: Date.now().toString(), text: data.message }]);
+      console.log("📩 Received:", data.message);
+      setChatLog((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          text: data.message,
+          fromSelf: false,
+        },
+      ]);
     };
 
     ws.current.onerror = (e) => {
-      console.error('❌ WebSocket error:', e.message);
+      console.error("❌ WebSocket error:", e.message);
     };
 
     ws.current.onclose = () => {
-      console.log('🔌 WebSocket disconnected');
+      console.log("🔌 WebSocket disconnected");
     };
 
     return () => {
@@ -33,19 +51,41 @@ export default function ChatScreen() {
   }, []);
 
   const sendMessage = () => {
-    if (ws.current && message.trim() !== '') {
+    if (ws.current && message.trim() !== "") {
+      const newMessage = {
+        id: Date.now().toString(),
+        text: message,
+        fromSelf: true,
+      };
+
       ws.current.send(JSON.stringify({ message }));
-      setMessage('');
+      setChatLog((prev) => [...prev, newMessage]);
+      setMessage("");
     }
   };
 
   return (
     <View style={styles.container}>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={chatLog}
-        renderItem={({ item }) => <Text style={styles.message}>{item.text}</Text>}
+        renderItem={({ item }) => (
+          <View
+            style={[
+              styles.messageWrapper,
+              item.fromSelf ? styles.selfMessage : styles.otherMessage,
+            ]}
+          >
+            <Text style={styles.messageText}>{item.text}</Text>
+          </View>
+        )}
         keyExtractor={(item) => item.id}
-        style={styles.chatArea}
+        contentContainerStyle={styles.chatArea}
       />
 
       <View style={styles.inputArea}>
@@ -55,60 +95,66 @@ export default function ChatScreen() {
           onChangeText={setMessage}
           placeholder="Введите сообщение"
         />
-        <Button title="Отправить" onPress={sendMessage} />
+        <Button title="➤" onPress={sendMessage} />
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#eef1f5',
-      paddingHorizontal: 16,
-      paddingTop: 40,
-    },
-    chatArea: {
-      flex: 1,
-      marginBottom: 16,
-    },
-    message: {
-      padding: 12,
-      backgroundColor: '#ffffff',
-      marginVertical: 6,
-      borderRadius: 12,
-      alignSelf: 'flex-start',
-      maxWidth: '80%',
-      fontSize: 16,
-      color: '#333',
-      shadowColor: '#000',
-      shadowOpacity: 0.05,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
-      elevation: 1,
-    },
-    inputArea: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: '#fff',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 12,
-      shadowColor: '#000',
-      shadowOpacity: 0.08,
-      shadowOffset: { width: 0, height: -1 },
-      shadowRadius: 4,
-      elevation: 4,
-    },
-    input: {
-      flex: 1,
-      borderColor: '#ccc',
-      borderWidth: 1,
-      borderRadius: 10,
-      paddingHorizontal: 14,
-      height: 44,
-      marginRight: 10,
-      backgroundColor: '#f9f9f9',
-    },
-  });
-  
+  container: {
+    flex: 1,
+    backgroundColor: "#eef1f5",
+    paddingTop: 40,
+  },
+  topBar: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 10,
+  },
+  chatArea: {
+    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingBottom: 80,
+  },
+  messageWrapper: {
+    maxWidth: "80%",
+    padding: 10,
+    borderRadius: 12,
+    marginVertical: 6,
+  },
+  selfMessage: {
+    backgroundColor: "#d1e7ff",
+    alignSelf: "flex-end",
+    borderTopRightRadius: 0,
+  },
+  otherMessage: {
+    backgroundColor: "#fff",
+    alignSelf: "flex-start",
+    borderTopLeftRadius: 0,
+  },
+  messageText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  inputArea: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderTopColor: "#ccc",
+    borderTopWidth: 1,
+    paddingBottom: 25,
+  },
+  input: {
+    flex: 1,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    height: 44,
+    marginRight: 10,
+    backgroundColor: "#f9f9f9",
+  },
+});

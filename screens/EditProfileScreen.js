@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -24,11 +24,14 @@ export default function EditProfileScreen({ navigation }) {
     const fetchProfile = async () => {
       const token = await AsyncStorage.getItem("accessToken");
       try {
-        const res = await fetch("http://172.20.10.10:8000/api/v1/auth/users/me/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          "http://172.20.10.10:8000/api/v1/auth/users/me/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await res.json();
         setForm({
           first_name: data.first_name || "",
@@ -47,17 +50,24 @@ export default function EditProfileScreen({ navigation }) {
     setForm({ ...form, [field]: value });
   };
 
+  const handleClearField = (field) => {
+    setForm({ ...form, [field]: "" });
+  };
+
   const handleSave = async () => {
     const token = await AsyncStorage.getItem("accessToken");
     try {
-      const res = await fetch("http://172.20.10.10:8000/api/v1/auth/users/me/", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        "http://172.20.10.10:8000/api/v1/auth/users/me/",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(form),
+        }
+      );
 
       if (res.ok) {
         Alert.alert("Success", "Profile updated successfully");
@@ -73,10 +83,11 @@ export default function EditProfileScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        {/* <Image
-          source={require("../assets/header-bg.png")}
-          style={styles.headerImage}
-        /> */}
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.avatarWrapper}>
           <Image source={require("../assets/ava.png")} style={styles.avatar} />
           <TouchableOpacity style={styles.editAvatar}>
@@ -87,32 +98,78 @@ export default function EditProfileScreen({ navigation }) {
 
       <View style={styles.form}>
         <View style={styles.row}>
-          <TextInput
-            value={form.first_name}
-            onChangeText={(text) => handleChange("first_name", text)}
-            style={styles.input}
-            placeholder="Name"
-          />
-          <TextInput
-            value={form.last_name}
-            onChangeText={(text) => handleChange("last_name", text)}
-            style={styles.input}
-            placeholder="Surname"
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              value={form.first_name}
+              onChangeText={(text) => handleChange("first_name", text)}
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="#999"
+            />
+            {form.first_name.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={() => handleClearField("first_name")}
+              >
+                <Ionicons name="close-circle" size={20} color="#999" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <TextInput
+              value={form.last_name}
+              onChangeText={(text) => handleChange("last_name", text)}
+              style={styles.input}
+              placeholder="Surname"
+              placeholderTextColor="#999"
+            />
+            {form.last_name.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearButton}
+                onPress={() => handleClearField("last_name")}
+              >
+                <Ionicons name="close-circle" size={20} color="#999" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
-        <TextInput
-          value={form.birth_date}
-          onChangeText={(text) => handleChange("birth_date", text)}
-          style={styles.fullInput}
-          placeholder="Birth of date"
-        />
-        <TextInput
-          value={form.phone}
-          onChangeText={(text) => handleChange("phone", text)}
-          style={styles.fullInput}
-          placeholder="Phone Number"
-        />
+        <View style={styles.inputWrapper}>
+          <TextInput
+            value={form.birth_date}
+            onChangeText={(text) => handleChange("birth_date", text)}
+            style={styles.input}
+            placeholder="Birth of date"
+            placeholderTextColor="#999"
+          />
+          {form.birth_date.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => handleClearField("birth_date")}
+            >
+              <Ionicons name="close-circle" size={20} color="#999" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <TextInput
+            value={form.phone}
+            onChangeText={(text) => handleChange("phone", text)}
+            style={styles.input}
+            placeholder="Phone Number"
+            placeholderTextColor="#999"
+          />
+          {form.phone.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => handleClearField("phone")}
+            >
+              <Ionicons name="close-circle" size={20} color="#999" />
+            </TouchableOpacity>
+          )}
+        </View>
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -130,11 +187,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  headerImage: {
+  topBar: {
     position: "absolute",
-    top: 0,
-    width: "100%",
-    height: 200,
+    top: 20,
+    left: 20,
+    zIndex: 10,
   },
   avatarWrapper: {
     position: "absolute",
@@ -164,19 +221,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  input: {
+  inputWrapper: {
+    position: "relative",
     flex: 1,
-    backgroundColor: "#f1f1f1",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-    marginHorizontal: 5,
+    marginBottom: 12,
   },
-  fullInput: {
+  input: {
     backgroundColor: "#f1f1f1",
     borderRadius: 10,
     padding: 10,
-    marginBottom: 10,
+    fontSize: 16,
+  },
+  clearButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
   saveButton: {
     backgroundColor: "#4f46e5",

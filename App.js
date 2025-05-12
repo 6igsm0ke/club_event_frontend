@@ -16,6 +16,9 @@ import VerifyAccountScreen from "./screens/VerifyYourScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import CategoryEventsScreen from "./screens/CategoryEventScreen";
+import ConferenceScreen from "./screens/SpeakersScreen";
+import SpeakerInfoScreen from "./screens/SpeakerInfoScreen";
+import EditEventScreen from "./screens/EditEventScreen";
 
 const Stack = createStackNavigator();
 
@@ -97,6 +100,21 @@ export default function App() {
           name="CategoryEvents"
           component={CategoryEventsScreen}
           options={{ title: "Category Events" }}
+        />
+        <Stack.Screen
+          name="Conference"
+          component={ConferenceScreen}
+          options={{ title: "Conference" }}
+        />
+        <Stack.Screen
+        name="SpeakerInfo"
+        component={SpeakerInfoScreen}
+        options={{ title: "Speaker Info" }}
+        />
+        <Stack.Screen
+          name="EditEvent"
+          component={EditEventScreen}
+          options={{ title: "Edit Event" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

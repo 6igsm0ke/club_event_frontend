@@ -11,6 +11,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 
+import NavigationBar from "../components/NavigationBar";
+
 const imageMap = {
   "vision.png": require("../assets/vision.png"),
   "qamqor.png": require("../assets/qamqor.png"),
@@ -87,87 +89,92 @@ export default function UserProfileScreen() {
     );
   }
 
+  // ...всё остаётся прежним до return
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.profileSection}>
-        <Image source={getImage("user.png")} style={styles.profileImage} />
-        <Text style={styles.userName}>
-          {userData?.first_name} {userData?.last_name}
-        </Text>
-        <Text style={styles.email}>{userData?.email}</Text>
-        <Text style={styles.userStats}>1200 Vol. Hours | 22 Projects</Text>
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <View style={styles.profileSection}>
+          <Image source={getImage("user.png")} style={styles.profileImage} />
+          <Text style={styles.userName}>
+            {userData?.first_name} {userData?.last_name}
+          </Text>
+          <Text style={styles.email}>{userData?.email}</Text>
+          <Text style={styles.userStats}>1200 Vol. Hours | 22 Projects</Text>
 
-        <TouchableOpacity
-          style={styles.editProfileButton}
-          onPress={() => navigation.navigate("EditProfile")}
-        >
-          <Text style={styles.editProfileText}>Edit Profile</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            await AsyncStorage.clear();
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "SignIn" }],
-            });
-          }}
-        >
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        {!showProcess ? (
-          <>
-            <TouchableOpacity style={styles.activeTab}>
-              <Text style={styles.tabText}>Clubs</Text>
-            </TouchableOpacity>
+          <View style={styles.profileButtons}>
             <TouchableOpacity
-              style={styles.inactiveTab}
-              onPress={() => setShowProcess(true)}
+              style={styles.editProfileButton}
+              onPress={() => navigation.navigate("EditProfile")}
             >
-              <Text style={styles.tabText}>Process</Text>
+              <Text style={styles.editProfileText}>Edit Profile</Text>
             </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity onPress={() => setShowProcess(false)}>
-            <Text style={styles.tabText}>← Back to Profile</Text>
-          </TouchableOpacity>
-        )}
-      </View>
 
-      {/* Content */}
-      {!showProcess ? (
-        <View style={styles.clubList}>
-          {clubs.map((club, index) => (
-            <View key={index} style={styles.clubCard}>
-              <Image source={getImage(club.icon)} style={styles.clubIcon} />
-              <View style={styles.clubInfo}>
-                <Text style={styles.clubName}>{club.name}</Text>
-                <Text style={styles.clubDescription}>{club.description}</Text>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={async () => {
+                await AsyncStorage.clear();
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "SignIn" }],
+                });
+              }}
+            >
+              <Text style={styles.logoutText}>Log Out</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity
+            style={!showProcess ? styles.activeTab : styles.inactiveTab}
+            onPress={() => setShowProcess(false)}
+          >
+            <Text style={styles.tabText}>Clubs</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={showProcess ? styles.activeTab : styles.inactiveTab}
+            onPress={() => setShowProcess(true)}
+          >
+            <Text style={styles.tabText}>Process</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Content */}
+        {!showProcess ? (
+          <View style={styles.clubList}>
+            {clubs.map((club, index) => (
+              <View key={index} style={styles.clubCard}>
+                <Image source={getImage(club.icon)} style={styles.clubIcon} />
+                <View style={styles.clubInfo}>
+                  <Text style={styles.clubName}>{club.name}</Text>
+                  <Text style={styles.clubDescription}>{club.description}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
-      ) : (
-        <View style={{ paddingHorizontal: 10 }}>
-          {events.map((event, index) => (
-            <View key={index} style={styles.eventCard}>
-              <Text style={styles.eventTitle}>{event.title}</Text>
-              <Text style={styles.eventTime}>
-                {event.time} — {event.location}
-              </Text>
-              {event.description && (
-                <Text style={styles.eventDescription}>{event.description}</Text>
-              )}
-            </View>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+            ))}
+          </View>
+        ) : (
+          <View style={{ paddingHorizontal: 10 }}>
+            {events.map((event, index) => (
+              <View key={index} style={styles.eventCard}>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                <Text style={styles.eventTime}>
+                  {event.time} — {event.location}
+                </Text>
+                {event.description && (
+                  <Text style={styles.eventDescription}>
+                    {event.description}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      <NavigationBar navigation={navigation} />
+    </View>
   );
 }
 
@@ -283,4 +290,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#444",
   },
+    profileButtons: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 10,
+  },
+  editProfileButton: {
+    backgroundColor: "#4A90E2",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+  editProfileText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  logoutButton: {
+    backgroundColor: "#e64a4a",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
 });

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-
+import NavigationBar from "../components/NavigationBar";
 export default function EventListScreen() {
   const navigation = useNavigation();
   const [events, setEvents] = useState([]);
@@ -22,13 +22,16 @@ export default function EventListScreen() {
     if (!refreshToken) return null;
 
     try {
-      const response = await fetch("http://172.20.10.10:8000/api/v1/auth/refresh/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
+      const response = await fetch(
+        "http://172.20.10.10:8000/api/v1/auth/refresh/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        }
+      );
 
       const data = await response.json();
       if (data.access) {
@@ -158,6 +161,7 @@ export default function EventListScreen() {
           );
         }}
       />
+      <NavigationBar navigation={navigation} />
     </View>
   );
 }
