@@ -1,12 +1,12 @@
 # ClubEvent Frontend
 
 This is the **frontend** part of the ClubEvent project. It is built using **React Native with Expo** to provide a cross-platform mobile interface for student event management.
-
+> ⚠️ This project is configured to run locally only. For deployment, additional setup is required.
 ## 📦 Installation
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/club_event_frontend.git
+   git clone https://github.com/6igsm0ke/club_event_frontend.git
    cd club_event_frontend
    ```
 
