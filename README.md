@@ -7,7 +7,7 @@ This is the **frontend** part of the ClubEvent project. It is built using **Reac
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/your-username/club_event_frontend.git
-   cd ClubEventFrontend
+   cd club_event_frontend
    ```
 
 2. **Install dependencies**:
