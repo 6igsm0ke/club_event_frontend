@@ -85,7 +85,7 @@ const eventCards = [
 
 const categories = [
   {
-    title: ["Social &", "Human Rights"],
+    title: ["Social & Human Rights"],
     icon: require("../assets/adam.png"),
     bg: "#A8D5E2",
     badge: true,
@@ -106,12 +106,12 @@ const categories = [
     bg: "#C5CBE3",
   },
   {
-    title: ["Education &", "Tutoring"],
+    title: ["Education"],
     icon: require("../assets/open book.png"),
     bg: "#B4D4B0",
   },
   {
-    title: ["Arts &", "Culture"],
+    title: ["Arts & Culture"],
     icon: require("../assets/color palette.png"),
     bg: "#F5CBA7",
   },

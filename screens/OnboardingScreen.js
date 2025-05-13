@@ -7,17 +7,17 @@ const slides = [
     {
         id: '1',
         title: "Let's grow together to be better",
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.',
+        description: ' Build connections that go beyond the classroom.',
     },
     {
         id: '2',
         title: 'Best courses to level up your skill',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.',
+        description: 'Your memories. Your milestones. All in one place.',
     },
     {
         id: '3',
         title: 'Support in your new career',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.',
+        description: ' Your journey starts where the events begin.',
     },
 ];
 
